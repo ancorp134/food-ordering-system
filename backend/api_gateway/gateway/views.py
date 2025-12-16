@@ -23,6 +23,8 @@ class AuthProxy(APIView):
         if auth_header:
             headers["Authorization"] = auth_header
 
+        print(headers["Authorization"])
+        
         response = requests.post(
             url,
             json=request.data,
