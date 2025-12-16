@@ -9,22 +9,26 @@ class AuthProxy(APIView):
 
     def get_permissions(self):
         if self.kwargs.get("path") in ["login", "register"]:
+            print(self.kwargs.get("path"))
             return [AllowAny()]
         return [IsAuthenticated()]
 
-    def post(self, request, path):
-        url = f"{AUTH_SERVICE_URL}/auth/{path}/"
-
+    def _forward_headers(self, request):
         headers = {
             "Content-Type": "application/json"
         }
-
         auth_header = request.headers.get("Authorization")
         if auth_header:
             headers["Authorization"] = auth_header
+        return headers
 
-        print(headers["Authorization"])
-        
+    def post(self, request, path):
+        print(path)
+        url = f"{AUTH_SERVICE_URL}/auth/{path}/"
+        headers = self._forward_headers(request)
+
+        print("POST Authorization:", headers.get("Authorization"))
+
         response = requests.post(
             url,
             json=request.data,
@@ -32,7 +36,26 @@ class AuthProxy(APIView):
             timeout=5
         )
 
-        # 🔥 SAFE RESPONSE HANDLING
+        try:
+            data = response.json()
+        except ValueError:
+            data = response.text or None
+
+        return Response(data, status=response.status_code)
+
+    def get(self, request, path):
+        print(path)
+        url = f"{AUTH_SERVICE_URL}/auth/{path}/"
+        headers = self._forward_headers(request)
+
+        print("GET Authorization:", headers.get("Authorization"))
+
+        response = requests.get(
+            url,
+            headers=headers,
+            timeout=5
+        )
+
         try:
             data = response.json()
         except ValueError:
