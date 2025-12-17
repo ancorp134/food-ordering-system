@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-c(blf2_5hiv42g6d+0u!4_4)+yfl_-&zebzk#z=suhhi^a3$#6'
+SECRET_KEY = 'django-insecure-6s=)9_#es6!jb2urw2=j52=x1&ke!-lcd)qj4x%3x_1vo2rp7$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,6 +40,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'restaurant'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication',
+    ),
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
