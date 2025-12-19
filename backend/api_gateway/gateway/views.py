@@ -90,4 +90,23 @@ class RestaurantProxy(APIView):
             data = respone.text or None
         
         return Response(data,status=respone.status_code)
+    
+    def post(self,request):
+        url = f"{RESTAURANT_SERVICE_URL}/restaurants/"
+        headers = self._forward_headers(request)
+        response = requests.post(
+            url=url,
+            json=request.data,
+            headers=headers,
+            timeout=5
+        )
+
+        try:
+            data = response.json()
+        except ValueError:
+            data = response.text or None
+
+        return Response(data,status=response.status_code)
+
+
 
