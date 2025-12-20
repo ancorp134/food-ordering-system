@@ -119,6 +119,39 @@ class RestaurantProxy(APIView):
 
         return Response(data, status=response.status_code)
     
+class RestaurantCategoryProxy(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def _forward_headers(self, request):
+        headers = {
+            "Content-Type": "application/json"
+        }
+        auth_header = request.headers.get("Authorization")
+        if auth_header:
+            headers["Authorization"] = auth_header
+
+        return headers
+    
+
+    def post(self,request,path=""):
+        url = f"{RESTAURANT_SERVICE_URL}/categories/{path}/"
+        headers = self._forward_headers(request)
+
+        response = requests.post(
+            url=url,
+            json = request.data,
+            headers=headers,
+            timeout=5
+        )
+
+        try:
+            data = response.json()
+        except ValueError:
+            data = response.text or None
+
+        return Response(data, status=response.status_code)
+    
 
     
 

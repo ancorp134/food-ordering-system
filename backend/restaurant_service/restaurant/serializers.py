@@ -6,6 +6,7 @@ class MenuItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
         fields = '__all__'
+        read_only_fields = ('category',)
 
 class CategorySerializer(serializers.ModelSerializer):
     items = MenuItemSerializer(many=True,read_only=True)
