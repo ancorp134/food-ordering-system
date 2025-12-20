@@ -65,35 +65,46 @@ class AuthProxy(APIView):
     
 
 
+
+
 class RestaurantProxy(APIView):
 
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def _forward_headers(self, request):
         headers = {
             "Content-Type": "application/json"
         }
         auth_header = request.headers.get("Authorization")
-        print(auth_header)
         if auth_header:
             headers["Authorization"] = auth_header
+
         return headers
-    
-    def get(self,request):
-        print("entering.......")
+
+    def get(self, request):
         url = f"{RESTAURANT_SERVICE_URL}/restaurants/"
         headers = self._forward_headers(request)
-        respone = requests.get(url=url,headers=headers,timeout=5)
+
+        response = requests.get(
+            url=url,
+            headers=headers,
+            timeout=5
+        )
+
         try:
-            data = respone.json()
+            data = response.json()
         except ValueError:
-            data = respone.text or None
-        
-        return Response(data,status=respone.status_code)
-    
-    def post(self,request):
-        url = f"{RESTAURANT_SERVICE_URL}/restaurants/"
+            data = response.text or None
+
+        return Response(data, status=response.status_code)
+
+    def post(self, request,path=""):
+        url = f"{RESTAURANT_SERVICE_URL}/restaurants/{path}/"
         headers = self._forward_headers(request)
+
         response = requests.post(
             url=url,
             json=request.data,
@@ -106,7 +117,11 @@ class RestaurantProxy(APIView):
         except ValueError:
             data = response.text or None
 
-        return Response(data,status=response.status_code)
+        return Response(data, status=response.status_code)
+    
+
+    
+
 
 
 
