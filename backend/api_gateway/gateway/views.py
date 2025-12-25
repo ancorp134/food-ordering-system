@@ -2,7 +2,7 @@ import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .services import AUTH_SERVICE_URL,RESTAURANT_SERVICE_URL,CART_SERVICE_URL
+from .services import AUTH_SERVICE_URL,RESTAURANT_SERVICE_URL,CART_SERVICE_URL,ORDER_SERVICE_URL
 
 
 class AuthProxy(APIView):
@@ -251,8 +251,38 @@ class CartProxy(APIView):
 
     
 
-    
+class OrderCheckoutProxy(APIView):
 
+    permission_classes = [IsAuthenticated]
+
+    def _forward_headers(self, request):
+        headers = {
+            "Content-Type": "application/json"
+        }
+        auth_header = request.headers.get("Authorization")
+        if auth_header:
+            headers["Authorization"] = auth_header
+
+        return headers
+    
+    def post(self,request):
+        url = f"{ORDER_SERVICE_URL}/order/checkout/"
+        headers = self._forward_headers(request)
+
+        response = requests.post(
+            json=request.data,
+            headers=headers,
+            url=url,
+            timeout=5
+        )
+
+        try:
+            data = response.json()
+        except ValueError:
+            data = response.text or None
+
+        return Response(data, status=response.status_code)
+        
 
 
 

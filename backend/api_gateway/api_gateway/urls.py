@@ -1,5 +1,5 @@
 from django.urls import path
-from gateway.views import AuthProxy,RestaurantProxy,RestaurantCategoryProxy,CartProxy
+from gateway.views import AuthProxy,RestaurantProxy,RestaurantCategoryProxy,CartProxy,OrderCheckoutProxy
 
 urlpatterns = [
     path('auth/<path:path>/', AuthProxy.as_view()),
@@ -9,4 +9,5 @@ urlpatterns = [
     path("cart/", CartProxy.as_view()),
     path("cart/items/", CartProxy.as_view()),
     path("cart/items/<uuid:item_id>/", CartProxy.as_view()),
+    path("order/checkout/",OrderCheckoutProxy.as_view()),
 ]
