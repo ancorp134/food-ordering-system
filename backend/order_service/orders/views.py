@@ -5,6 +5,7 @@ from .serializer import OrderSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .models import Order
+from .cart_client import get_cart,clear_cart
 # Create your views here.
 
 
@@ -12,14 +13,29 @@ class OrderCheckOut(APIView):
 
     permission_classes = [IsAuthenticated]
 
-
-    
-
     def post(self, request):
-        serializer = OrderSerializer(data=request.data, context={"request": request})
+
+        auth_header = request.headers.get("Authorization")
+
+        cart = get_cart(auth_header)
+
+        if not cart or not cart.get("items"):
+            return Response(
+                {"detail": "Cart is empty"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        
+        order_payload = {
+            "restaurant_id": cart["restaurant_id"],
+            "items": cart["items"]
+        }
+
+        serializer = OrderSerializer(data=order_payload, context={"request": request})
 
         if serializer.is_valid():
             serializer.save()
+            clear_cart(auth_header)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -39,4 +55,3 @@ class CustomerOrderView(APIView):
         serializer = OrderSerializer(orders,many=True)
         
         return Response(serializer.data,status=status.HTTP_200_OK)
-        # return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)

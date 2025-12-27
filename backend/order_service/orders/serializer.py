@@ -6,7 +6,7 @@ from django.db import transaction
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ("menu_item_id", "quantity", "item_price")
+        fields = ("menu_item_id", "quantity", "price")
 
         def validate_quantity(self, value):
             if value <= 0:
@@ -15,7 +15,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
                 )
             return value
 
-        def validate_item_price(self, value):
+        def validate_price(self, value):
             if value <= 0:
                 raise serializers.ValidationError("Price must be greater than zero.")
             return value
@@ -55,7 +55,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
         items_data = validated_data.pop("items")
 
-        total_amount = sum(item["quantity"] * item["item_price"] for item in items_data)
+        total_amount = sum(item["quantity"] * item["price"] for item in items_data)
 
         order = Order.objects.create(
             customer_id=customer_id,
@@ -69,7 +69,7 @@ class OrderSerializer(serializers.ModelSerializer):
                 order=order,
                 menu_item_id=item["menu_item_id"],
                 quantity=item["quantity"],
-                item_price=item["item_price"],
+                price=item["price"],
             )
 
         return order
