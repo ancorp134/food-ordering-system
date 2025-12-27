@@ -10,4 +10,6 @@ urlpatterns = [
     path("cart/items/", CartProxy.as_view()),
     path("cart/items/<uuid:item_id>/", CartProxy.as_view()),
     path("order/checkout/",OrderCheckoutProxy.as_view()),
+    path("orders/me/",OrderCheckoutProxy.as_view()),
+
 ]

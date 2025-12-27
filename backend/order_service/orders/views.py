@@ -13,6 +13,21 @@ class OrderCheckOut(APIView):
     permission_classes = [IsAuthenticated]
 
 
+    
+
+    def post(self, request):
+        serializer = OrderSerializer(data=request.data, context={"request": request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomerOrderView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
     def get(self,request):
         cust_id = request.user.token.get("user_id")
 
@@ -22,14 +37,6 @@ class OrderCheckOut(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
         serializer = OrderSerializer(orders,many=True)
-        if serializer.is_valid():
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-    def post(self, request):
-        serializer = OrderSerializer(data=request.data, context={"request": request})
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response(serializer.data,status=status.HTTP_200_OK)
+        # return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)

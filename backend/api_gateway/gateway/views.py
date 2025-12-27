@@ -265,6 +265,19 @@ class OrderCheckoutProxy(APIView):
 
         return headers
     
+
+    def get(self,request):
+        url = f"{ORDER_SERVICE_URL}/orders/me/"
+        headers = self._forward_headers(request)
+
+        response = requests.get(url=url,headers=headers,timeout=5)
+        try:
+            data = response.json()
+        except ValueError:
+            data = response.text or None
+
+        return Response(data, status=response.status_code)
+    
     def post(self,request):
         url = f"{ORDER_SERVICE_URL}/order/checkout/"
         headers = self._forward_headers(request)
@@ -282,6 +295,8 @@ class OrderCheckoutProxy(APIView):
             data = response.text or None
 
         return Response(data, status=response.status_code)
+    
+
         
 
 
