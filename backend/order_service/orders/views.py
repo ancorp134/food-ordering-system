@@ -6,8 +6,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .models import Order
 from .cart_client import get_cart,clear_cart
+from django.db.models import Q
 # Create your views here.
 
+
+class HealthCheckView(APIView):
+
+    def get(self,request):
+        return Response({"status": "up"})
 
 class OrderCheckOut(APIView):
 
@@ -55,3 +61,20 @@ class CustomerOrderView(APIView):
         serializer = OrderSerializer(orders,many=True)
         
         return Response(serializer.data,status=status.HTTP_200_OK)
+    
+
+
+class CustomerOrder(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,id):
+        cust_id = request.user.token.get("user_id")
+        try:
+            order = Order.objects.get(Q(id=id) & Q(customer_id = cust_id))
+        except Order.DoesNotExist:
+            Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = OrderSerializer(order)
+        
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
