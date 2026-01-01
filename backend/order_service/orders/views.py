@@ -13,7 +13,7 @@ from django.db.models import Q
 class HealthCheckView(APIView):
 
     def get(self,request):
-        return Response({"status": "up"})
+        return Response({"status": "UP"})
 
 class OrderCheckOut(APIView):
 
