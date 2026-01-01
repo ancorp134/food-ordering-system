@@ -5,7 +5,7 @@ CONSUL_URL = "http://localhost:8500"
 
 def register_service(service_name: str, service_port: int):
     service_id = f"{service_name}-{service_port}"
-    address = "127.0.0.1"
+    address = "host.docker.internal"
 
     payload = {
         "ID": service_id,
