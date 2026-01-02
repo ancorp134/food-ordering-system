@@ -2,8 +2,8 @@ import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .services import AUTH_SERVICE_URL,RESTAURANT_SERVICE_URL,CART_SERVICE_URL,ORDER_SERVICE_URL
-
+from .services import AUTH_SERVICE_URL,RESTAURANT_SERVICE_URL,CART_SERVICE_URL
+from api_gateway.Clients.order_client import *
 
 class AuthProxy(APIView):
 
@@ -255,46 +255,22 @@ class OrderCheckoutProxy(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    def _forward_headers(self, request):
-        headers = {
-            "Content-Type": "application/json"
-        }
-        auth_header = request.headers.get("Authorization")
-        if auth_header:
-            headers["Authorization"] = auth_header
+    def post(self,request):
 
-        return headers
+        client = OrderServiceClient(
+            request.headers.get("Authorization")
+        )
+        response = client.checkout(request.data)
+        return Response(response.json(),status=response.status_code)
     
 
     def get(self,request):
-        url = f"{ORDER_SERVICE_URL}/orders/me/"
-        headers = self._forward_headers(request)
-
-        response = requests.get(url=url,headers=headers,timeout=5)
-        try:
-            data = response.json()
-        except ValueError:
-            data = response.text or None
-
-        return Response(data, status=response.status_code)
-    
-    def post(self,request):
-        url = f"{ORDER_SERVICE_URL}/order/checkout/"
-        headers = self._forward_headers(request)
-
-        response = requests.post(
-            json=request.data,
-            headers=headers,
-            url=url,
-            timeout=5
+        client = OrderServiceClient(
+            request.headers.get("Authorization")
         )
+        response = client.myorders()
+        return Response(response.json(),status=response.status_code)
 
-        try:
-            data = response.json()
-        except ValueError:
-            data = response.text or None
-
-        return Response(data, status=response.status_code)
     
 
         
