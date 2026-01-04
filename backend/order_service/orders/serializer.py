@@ -1,7 +1,7 @@
 from .models import Order, OrderItem
 from rest_framework import serializers
 from django.db import transaction
-
+import order_service.common.kafkaproducer
 
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
